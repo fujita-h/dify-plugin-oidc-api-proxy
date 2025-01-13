@@ -1,0 +1,55 @@
+settings:
+  - name: oidc_issuer
+    type: text-input
+    required: true
+    label:
+      en_US: OIDC - Issuer
+    placeholder:
+      en_US: Please input OpenID Issuer (like https://<your-oidc-provider>)
+  - name: oidc_audience
+    type: text-input
+    required: true
+    label:
+      en_US: OIDC - Audience
+    placeholder:
+      en_US: Identifier issued by the OIDC provider (like Audience or ClientID)
+  - name: oidc_scope
+    type: text-input
+    required: false
+    label:
+      en_US: OIDC - Scope
+    placeholder:
+      en_US: The "scope" that requires validation (if required).
+  - name: dify_api_url
+    type: text-input
+    required: true
+    label:
+      en_US: Dify - API URL
+    placeholder:
+      en_US: https://api.dify.ai/v1
+  - name: dify_api_key
+    type: secret-input
+    required: true
+    label:
+      en_US: Dify - API Key
+    placeholder:
+      en_US: Please input Dify API Key
+endpoints:
+  - endpoints/definitions/get/conversations.yaml
+  - endpoints/definitions/get/info.yaml
+  - endpoints/definitions/get/messages.yaml
+  - endpoints/definitions/get/messages_message_id_suggested.yaml
+  - endpoints/definitions/get/meta.yaml
+  - endpoints/definitions/get/parameters.yaml
+  - endpoints/definitions/get/workflows_logs.yaml
+  - endpoints/definitions/get/workflows_run_workflow_id.yaml
+  - endpoints/definitions/post/audio_to_text.yaml
+  - endpoints/definitions/post/chat_messages.yaml
+  - endpoints/definitions/post/chat_messages_task_id_stop.yaml
+  - endpoints/definitions/post/conversations_conversation_id_name.yaml
+  - endpoints/definitions/post/files_upload.yaml
+  - endpoints/definitions/post/messages_message_id_feedbacks.yaml
+  - endpoints/definitions/post/text_to_audio.yaml
+  - endpoints/definitions/post/workflows_run.yaml
+  - endpoints/definitions/post/workflows_tasks_task_id_stop.yaml
+  - endpoints/definitions/delete/conversations_conversation_id.yaml

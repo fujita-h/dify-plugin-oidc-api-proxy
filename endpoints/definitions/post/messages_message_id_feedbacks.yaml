@@ -1,0 +1,5 @@
+path: "/messages/<message_id>/feedbacks"
+method: "POST"
+extra:
+  python:
+    source: "endpoints/oidc_api_proxy.py"

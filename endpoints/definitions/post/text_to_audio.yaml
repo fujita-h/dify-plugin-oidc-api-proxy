@@ -1,0 +1,5 @@
+path: "/text-to-audio"
+method: "POST"
+extra:
+  python:
+    source: "endpoints/oidc_api_proxy.py"

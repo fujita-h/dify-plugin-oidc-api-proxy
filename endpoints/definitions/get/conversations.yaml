@@ -1,0 +1,5 @@
+path: "/conversations"
+method: "GET"
+extra:
+  python:
+    source: "endpoints/oidc_api_proxy.py"

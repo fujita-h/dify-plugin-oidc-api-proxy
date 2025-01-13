@@ -1,0 +1,5 @@
+path: "/chat-messages/<task_id>/stop"
+method: "POST"
+extra:
+  python:
+    source: "endpoints/oidc_api_proxy.py"

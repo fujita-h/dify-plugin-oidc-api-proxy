@@ -1,0 +1,5 @@
+path: "/messages/<message_id>/suggested"
+method: "GET"
+extra:
+  python:
+    source: "endpoints/oidc_api_proxy.py"

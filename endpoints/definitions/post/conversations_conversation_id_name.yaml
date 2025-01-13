@@ -1,0 +1,5 @@
+path: "/conversations/<conversation_id>/name"
+method: "POST"
+extra:
+  python:
+    source: "endpoints/oidc_api_proxy.py"
