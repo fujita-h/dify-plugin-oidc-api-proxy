@@ -3,10 +3,10 @@ type: plugin
 author: fujita-h
 name: oidc_api_proxy
 label:
-  en_US: oidc_api_proxy
+  en_US: OpenID Connect API Proxy
 description:
   en_US: This plugin relays the API provided by Dify chat/workflow with OpenID Connect authentication enabled.
-icon: icon.svg
+icon: icon-oidc-api-proxy.jpg
 resource:
   memory: 268435456
   permission:
