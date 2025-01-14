@@ -34,6 +34,13 @@ settings:
       en_US: Dify - API Key
     placeholder:
       en_US: Please input Dify API Key
+  - name: dify_replace_user_param_claim
+    type: text-input
+    required: false
+    label:
+      en_US: Dify - Replace user parameters using OIDC claims
+    placeholder:
+      en_US: Please input the claim name to use for replacement (if required).
 endpoints:
   - endpoints/definitions/get/conversations.yaml
   - endpoints/definitions/get/info.yaml

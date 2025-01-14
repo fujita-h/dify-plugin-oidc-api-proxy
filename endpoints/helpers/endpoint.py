@@ -3,6 +3,7 @@ from typing import Any, Tuple
 
 import httpx
 import werkzeug
+import werkzeug.datastructures
 
 
 def proxy_response(
@@ -128,3 +129,26 @@ def check_llm_streaming_request(request: werkzeug.Request) -> Tuple[bool, bool]:
                     is_stream = True
 
     return is_llm, is_stream
+
+
+def replace_user_params(
+    user: str,
+    args: werkzeug.datastructures.MultiDict[str, str],
+    json: Any | None,
+    data: werkzeug.datastructures.ImmutableMultiDict[str, str],
+) -> Tuple[
+    werkzeug.datastructures.MultiDict[str, str],
+    Any | None,
+    werkzeug.datastructures.ImmutableMultiDict[str, str],
+]:
+    if not user:
+        return args, json, data
+
+    if args:
+        args["user"] = user
+    if json is not None:
+        json["user"] = user
+    if data:
+        data["user"] = user
+
+    return args, json, data

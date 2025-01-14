@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 from dify_plugin import Endpoint
 from werkzeug import Request, Response
 
-from endpoints.helpers.endpoint import OidcApiProxyErrorResponse, proxy_response
+from endpoints.helpers.endpoint import OidcApiProxyErrorResponse, proxy_response, replace_user_params
 from endpoints.helpers.oidc import OpenIDConnectDiscoveryProvider
 
 
@@ -16,6 +16,7 @@ class OidcApiProxyEndpoint(Endpoint):
         oidc_scope = str(settings.get("oidc_scope", ""))
         dify_api_url = str(settings.get("dify_api_url", ""))
         dify_api_key = str(settings.get("dify_api_key", ""))
+        dify_replace_user_param_claim = str(settings.get("dify_replace_user_param_claim", ""))
 
         # prepare dify api url by removing trailing slash
         if dify_api_url.endswith("/"):
@@ -43,7 +44,7 @@ class OidcApiProxyEndpoint(Endpoint):
         # Verify access token
         try:
             oidc_provider = OpenIDConnectDiscoveryProvider(self.session, oidc_issuer, oidc_audience, oidc_scope)
-            _ = oidc_provider.verify_access_token(access_token)
+            oidc_claims = oidc_provider.verify_access_token(access_token)
         except Exception as e:
             return OidcApiProxyErrorResponse(str(e), 401)
 
@@ -61,8 +62,14 @@ class OidcApiProxyEndpoint(Endpoint):
             **({"Content-Type": r.headers["Content-Type"]} if r.headers.get("Content-Type") else {}),
         }
 
-        # prepare json if request is json
+        # prepare params, json and data
+        params = r.args
         json = r.get_json() if r.is_json else None
+        data = r.form
+
+        # replace user params
+        user = str(oidc_claims.get(dify_replace_user_param_claim, ""))
+        params, json, data = replace_user_params(user, params, json, data)
 
         # prepare files if request has files
         files = [
@@ -72,7 +79,7 @@ class OidcApiProxyEndpoint(Endpoint):
         # Forward request to Dify API with Syncronous HTTP Client
         try:
             return proxy_response(
-                request=r, method=r.method, url=url, headers=headers, params=r.args, json=json, data=r.form, files=files
+                request=r, method=r.method, url=url, headers=headers, params=params, json=json, data=data, files=files
             )
         except Exception as e:
             print(str(e))
