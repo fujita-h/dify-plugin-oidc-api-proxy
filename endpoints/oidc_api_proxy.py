@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 from dify_plugin import Endpoint
 from werkzeug import Request, Response
 
-from endpoints.helpers.endpoint import OidcApiProxyErrorResponse, proxy_response, replace_user_params
+from endpoints.helpers.endpoint import OidcApiProxyErrorResponse, get_extended_json, proxy_response, replace_user_params
 from endpoints.helpers.oidc import OpenIDConnectDiscoveryProvider
 
 
@@ -64,7 +64,7 @@ class OidcApiProxyEndpoint(Endpoint):
 
         # prepare params, json and data
         params = r.args
-        json = r.get_json() if r.is_json else None
+        json = get_extended_json(r, oidc_claims)
         data = r.form
 
         # replace user params

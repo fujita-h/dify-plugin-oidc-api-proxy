@@ -131,6 +131,27 @@ def check_app_streaming_request(request: werkzeug.Request) -> Tuple[bool, bool]:
     return is_app_call, is_stream
 
 
+def get_extended_json(request: werkzeug.Request, claims: dict) -> Any | None:
+    if not request.is_json:
+        return None
+
+    json = request.get_json()
+    if request.method.lower() not in ["post"]:
+        return json
+    if request.path not in ["/chat-messages", "/workflows/run"]:
+        return json
+
+    if isinstance(json, dict) and "inputs" in json:
+        for claim in claims:
+            try:
+                key = f"__oidc_{claim}"
+                json["inputs"][key] = claims[claim]
+            except Exception:
+                pass
+
+    return json
+
+
 def replace_user_params(
     user: str,
     args: werkzeug.datastructures.MultiDict[str, str],
