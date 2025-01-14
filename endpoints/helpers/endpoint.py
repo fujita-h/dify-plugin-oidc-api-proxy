@@ -11,9 +11,13 @@ def proxy_response(
     headers: httpx._types.HeaderTypes | None,
     params: httpx._types.QueryParamTypes | None,
     json: Any | None,
+    data: httpx._types.RequestData | None,
+    files: httpx._types.RequestFiles | None,
 ) -> werkzeug.Response:
     with httpx.Client() as client:
-        response = client.request(method=method, url=url, headers=headers, params=params, json=json)
+        response = client.request(
+            method=method, url=url, headers=headers, params=params, json=json, data=data, files=files
+        )
 
         return werkzeug.Response(
             response=response.content,
@@ -28,8 +32,10 @@ def proxy_stream_response(
     headers: httpx._types.HeaderTypes | None,
     params: httpx._types.QueryParamTypes | None,
     json: Any | None,
+    data: httpx._types.RequestData | None,
+    files: httpx._types.RequestFiles | None,
 ) -> werkzeug.Response:
-    stream_context = httpx.stream(method=method, url=url, headers=headers, json=json)
+    stream_context = httpx.stream(method=method, url=url, headers=headers, json=json, data=data, files=files)
 
     # Manually enter the context manager to get the response
     stream_response = stream_context.__enter__()

@@ -64,9 +64,16 @@ class OidcApiProxyEndpoint(Endpoint):
         # prepare json if request is json
         json = r.get_json() if r.is_json else None
 
+        # prepare files if request has files
+        files = [
+            (file, (r.files[file].filename, r.files[file].stream, r.files[file].content_type)) for file in r.files
+        ] or None
+
         # Forward request to Dify API with Syncronous HTTP Client
         try:
-            return proxy_stream_response(method=r.method, url=url, headers=headers, params=r.args, json=json)
+            return proxy_stream_response(
+                method=r.method, url=url, headers=headers, params=r.args, json=json, data=r.form, files=files
+            )
         except Exception as e:
             print(str(e))
             return OidcApiProxyErrorResponse(str(e), 500)
