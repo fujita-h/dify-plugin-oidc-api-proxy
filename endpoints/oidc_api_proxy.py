@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 from dify_plugin import Endpoint
 from werkzeug import Request, Response
 
-from endpoints.helpers.endpoint import OidcApiProxyErrorResponse, proxy_response, proxy_stream_response
+from endpoints.helpers.endpoint import OidcApiProxyErrorResponse, proxy_response
 from endpoints.helpers.oidc import OpenIDConnectDiscoveryProvider
 
 
@@ -71,8 +71,8 @@ class OidcApiProxyEndpoint(Endpoint):
 
         # Forward request to Dify API with Syncronous HTTP Client
         try:
-            return proxy_stream_response(
-                method=r.method, url=url, headers=headers, params=r.args, json=json, data=r.form, files=files
+            return proxy_response(
+                request=r, method=r.method, url=url, headers=headers, params=r.args, json=json, data=r.form, files=files
             )
         except Exception as e:
             print(str(e))
