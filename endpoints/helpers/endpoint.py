@@ -16,9 +16,9 @@ def proxy_response(
     data: httpx._types.RequestData | None,
     files: httpx._types.RequestFiles | None,
 ) -> werkzeug.Response:
-    is_llm, is_stream = check_llm_streaming_request(request)
+    is_app_call, is_stream = check_app_streaming_request(request)
 
-    if is_llm and is_stream:
+    if is_app_call and is_stream:
         return proxy_stream_response(
             method=method,
             url=url,
@@ -29,7 +29,7 @@ def proxy_response(
             files=files,
             timeout=httpx.Timeout(None, read=300, write=10),
         )
-    elif is_llm:
+    elif is_app_call and not is_stream:
         return proxy_blocking_response(
             method=method,
             url=url,
@@ -116,19 +116,19 @@ def OidcApiProxyErrorResponse(message: str, error_code: int = 500) -> werkzeug.R
     )
 
 
-def check_llm_streaming_request(request: werkzeug.Request) -> Tuple[bool, bool]:
-    is_llm = False
+def check_app_streaming_request(request: werkzeug.Request) -> Tuple[bool, bool]:
+    is_app_call = False
     is_stream = False
 
     if request.method.lower() in ["post"]:
         if request.path in ["/chat-messages", "/workflows/run"]:
-            is_llm = True
+            is_app_call = True
             if request.is_json:
                 json = request.get_json()
                 if str(json.get("response_mode", "")).lower() == "streaming":
                     is_stream = True
 
-    return is_llm, is_stream
+    return is_app_call, is_stream
 
 
 def replace_user_params(
