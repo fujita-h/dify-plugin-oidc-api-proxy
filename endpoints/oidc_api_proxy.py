@@ -1,11 +1,10 @@
-from typing import Any, Mapping
+from typing import Mapping
 from urllib.parse import urlparse
 
-import httpx
 from dify_plugin import Endpoint
 from werkzeug import Request, Response
 
-from endpoints.helpers.endpoint import OidcApiProxyErrorResponse
+from endpoints.helpers.endpoint import OidcApiProxyErrorResponse, proxy_response, proxy_stream_response
 from endpoints.helpers.oidc import OpenIDConnectDiscoveryProvider
 
 
@@ -17,6 +16,10 @@ class OidcApiProxyEndpoint(Endpoint):
         oidc_scope = str(settings.get("oidc_scope", ""))
         dify_api_url = str(settings.get("dify_api_url", ""))
         dify_api_key = str(settings.get("dify_api_key", ""))
+
+        # prepare dify api url by removing trailing slash
+        if dify_api_url.endswith("/"):
+            dify_api_url = dify_api_url[:-1]
 
         # Validate settings
         if not oidc_issuer:
@@ -48,57 +51,22 @@ class OidcApiProxyEndpoint(Endpoint):
         ## Prepare request
         ##
 
-        # Replace URL with Dify API URL
-        if dify_api_url.endswith("/"):
-            dify_api_url = dify_api_url[:-1]
+        # prepare url
+        url = f"{dify_api_url}{r.path}"
 
-        url = f"{dify_api_url}{r.full_path}"
-
-        # Replace werkzeug headers to httpx headers,
-        # with replacing host and authorization headers
+        # prepare headers
         headers = {
             "Host": urlparse(dify_api_url).netloc,
             "Authorization": f"Bearer {dify_api_key}",
-            "Content-Type": r.content_type or None,
+            **({"Content-Type": r.headers["Content-Type"]} if r.headers.get("Content-Type") else {}),
         }
+
+        # prepare json if request is json
         json = r.get_json() if r.is_json else None
 
         # Forward request to Dify API with Syncronous HTTP Client
         try:
-            return proxy_stream_response(r, url, headers, json)
+            return proxy_stream_response(method=r.method, url=url, headers=headers, params=r.args, json=json)
         except Exception as e:
             print(str(e))
             return OidcApiProxyErrorResponse(str(e), 500)
-
-
-def proxy_response(r: Request, url: str, headers: Mapping, json: Any | None) -> Response:
-    with httpx.Client() as client:
-        response = client.request(method=r.method, url=url, headers=headers, json=json)
-
-        return Response(
-            response=response.content,
-            status=response.status_code,
-            content_type=response.headers.get("Content-Type"),
-        )
-
-
-def proxy_stream_response(r: Request, url: str, headers: Mapping, json: Any | None) -> Response:
-    stream_context = httpx.stream(method=r.method, url=url, headers=headers, json=json)
-
-    # Manually enter the context manager to get the response
-    stream_response = stream_context.__enter__()
-
-    # Create a generator to stream the response
-    def generate():
-        try:
-            for chunk in stream_response.iter_bytes():
-                yield chunk
-        finally:
-            # Manually exit the context manager after the generator is exhausted
-            stream_context.__exit__(None, None, None)
-
-    return Response(
-        generate(),
-        status=stream_response.status_code,
-        content_type=stream_response.headers.get("Content-Type"),
-    )
