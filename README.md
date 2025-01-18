@@ -3,8 +3,8 @@
 # OpenID Connect API Proxy 
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub_Repo-fujita--h/dify--plugin--oidc--api--proxy-blue?logo=github)](https://github.com/fujita-h/dify-plugin-oidc-api-proxy)  
-![GitHub Release](https://img.shields.io/github/v/release/fujita-h/dify-plugin-oidc-api-proxy)
-![GitHub License](https://img.shields.io/github/license/fujita-h/dify-plugin-oidc-api-proxy)
+[![GitHub Release](https://img.shields.io/github/v/release/fujita-h/dify-plugin-oidc-api-proxy)](https://github.com/fujita-h/dify-plugin-oidc-api-proxy/releases)
+[![GitHub License](https://img.shields.io/github/license/fujita-h/dify-plugin-oidc-api-proxy)](https://github.com/fujita-h/dify-plugin-oidc-api-proxy/blob/main/LICENSE)
 
 This plugin relays the API provided by Dify chat/workflow with OpenID Connect authentication enabled.
 
@@ -30,6 +30,10 @@ Plugin automatically inputs the claim data obtained by OpenID Connect authentica
 
 To use the claim data in the Chat/Workflow App, you need to specify the claim data name to the Start node's `input` parameter. For example, if you specify `__oidc_email` to the `input` parameter, you can use the email address in the Chat/Workflow App.
 
+## Configuration and Usage
+
+See [Plugin README](./README.difypkg.md) for configuration and usage details.
+
 ## Contributing
 
-This plugin is open-source and contributions are welcome. Please visit the GitHub repository to contribute.
+This plugin is open-source and contributions are welcome.
